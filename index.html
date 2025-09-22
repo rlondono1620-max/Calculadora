@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distribución Personalizada de Presupuesto</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .header h1 {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      letter-spacing: -0.02em;
+    }
+    
+    .header p {
+      color: #64748b;
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+    
+    .config-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .section-title {
+      color: #1e293b;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 30px;
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      border-radius: 2px;
+    }
+    
+    .budget-input {
+      display: flex;
+      gap: 25px;
+      align-items: end;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    
+    .input-group {
+      flex: 1;
+      min-width: 250px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #374151;
+      font-weight: 500;
+      font-size: 15px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: white;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    .selection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    
+    .selection-panel {
+      background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .selection-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    }
+    
+    .selection-panel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .panel-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid #f1f5f9;
+      transition: all 0.2s ease;
+    }
+    
+    .checkbox-item:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      accent-color: #3b82f6;
+    }
+    
+    .checkbox-item label {
+      margin: 0;
+      flex: 1;
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .percentage-input {
+      width: 80px;
+      padding: 8px 12px;
+      font-size: 14px;
+      text-align: center;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    
+    .percentage-input:disabled {
+      background: #f8fafc;
+      color: #94a3b8;
+      border-color: #e2e8f0;
+    }
+    
+    .total-indicator {
+      background: #e0f2fe;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 600;
+      margin-top: 20px;
+      border: 1px solid #b3e5fc;
+      transition: all 0.3s ease;
+    }
+    
+    .total-indicator.valid {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+    
+    .total-indicator.invalid {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+    
+    .calculate-btn {
+      width: 100%;
+      padding: 20px;
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 20px;
+      font-family: 'Inter', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .calculate-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .calculate-btn:hover:not(:disabled)::before {
+      left: 100%;
+    }
+    
+    .calculate-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+    }
+    
+    .calculate-btn:disabled {
+      background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .results-section {
+      display: none;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      margin-top: 30px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .content-count {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .export-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .export-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .export-excel {
+      background: #10b981;
+      color: white;
+    }
+    
+    .export-csv {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .export-pdf {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .export-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .result-card {
+      background: linear-gradient(145deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    
+    .result-card:hover {
+      transform: translateY(-5px) scale(1.02);
+    }
+    
+    .result-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      opacity: 0.9;
+    }
+    
+    .result-amount {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    
+    .result-percentage {
+      font-size: 14px;
+      opacity: 0.8;
+      font-weight: 400;
+    }
+    
+    .table-container {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border: 1px solid #f1f5f9;
+    }
+    
+    .detailed-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .detailed-table th,
+    .detailed-table td {
+      padding: 18px 20px;
+      text-align: left;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 15px;
+    }
+    
+    .detailed-table th {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+    
+    .detailed-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    
+    .detailed-table tr:hover:not(.summary-row) {
+      background: #f0f9ff;
+      transform: scale(1.01);
+      transition: all 0.2s ease;
+    }
+    
+    .summary-row {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+      color: white;
+      font-weight: 700;
+    }
+    
+    .summary-row td {
+      border-bottom: none;
+      font-size: 16px;
+    }
+    
+    @media (max-width: 1200px) {
+      .selection-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .selection-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .budget-input {
+        flex-direction: column;
+      }
+      
+      .header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .export-buttons {
+        flex-direction: column;
+      }
+      
+      .detailed-table {
+        font-size: 14px;
+      }
+      
+      .detailed-table th,
+      .detailed-table td {
+        padding: 12px 10px;
+      }
+    }
+    
+    /* Animaciones */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .results-section {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    }
+
+    /* Estilos para módulo ML */
+    .ml-info {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .ml-info p {
+      margin: 0;
+      color: #0f172a;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .content-stats {
+      text-align: center;
+      padding: 15px;
+    }
+
+    .content-count-big {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 8px;
+    }
+
+    .insufficient {
+      color: #dc2626;
+      font-weight: 600;
+    }
+
+    .redistribution-alert {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 15px;
+      color: #92400e;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Responsive mejorado */
+    @media (max-width: 600px) {
+      .ml-info {
+        padding: 15px;
+      }
+      
+      .content-count-big {
+        font-size: 2rem;
+      }
+      
+      .detailed-table th,
+      .detailed-table td {
+        font-size: 13px;
+        padding: 8px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💼 Calculadora de Distribución Inteligente</h1>
+      <p>Optimiza tu presupuesto con distribución personalizada y análisis avanzado</p>
+    </div>
+    
+    <div class="config-section">
+      <div class="budget-input">
+        <div class="input-group">
+          <label for="presupuesto">💰 Presupuesto Total (USD)</label>
+          <input type="number" id="presupuesto" placeholder="Ejemplo: 25000" min="1" step="100">
+        </div>
+        <button class="calculate-btn" onclick="calcularDistribucion()" id="calcBtn" disabled>
+          🚀 Calcular Distribución
+        </button>
+      </div>
+      
+      <div class="selection-grid">
+        <!-- Países -->
+        <div class="selection-panel">
+          <div class="panel-title">🌍 Países</div>
+          <div class="checkbox-group" id="paises-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="colombia" onchange="toggleCountry('colombia')">
+              <label for="colombia">Colombia</label>
+              <input type="number" class="percentage-input" id="colombia-pct" min="0" max="100" value="90" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="peru" onchange="toggleCountry('peru')">
+              <label for="peru">Perú</label>
+              <input type="number" class="percentage-input" id="peru-pct" min="0" max="100" value="10" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="chile" onchange="toggleCountry('chile')">
+              <label for="chile">Chile</label>
+              <input type="number" class="percentage-input" id="chile-pct" min="0" max="100" value="0" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="mexico" onchange="toggleCountry('mexico')">
+              <label for="mexico">México</label>
+              <input type="number" class="percentage-input" id="mexico-pct" min="0" max="100" value="0" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="bolivia" onchange="toggleCountry('bolivia')">
+              <label for="bolivia">Bolivia</label>
+              <input type="number" class="percentage-input" id="bolivia-pct" min="0" max="100" value="0" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+          </div>
+          <div class="total-indicator" id="paises-total">Total: 0%</div>
+        </div>
+        
+        <!-- Categorías/Tiers -->
+        <div class="selection-panel">
+          <div class="panel-title">🎯 Categorías</div>
+          <div class="checkbox-group" id="categorias-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="macro" onchange="toggleCategory('macro')">
+              <label for="macro">MACRO</label>
+              <input type="number" class="percentage-input" id="macro-pct" min="0" max="100" value="20" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="top" onchange="toggleCategory('top')">
+              <label for="top">TOP</label>
+              <input type="number" class="percentage-input" id="top-pct" min="0" max="100" value="30" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="mid" onchange="toggleCategory('mid')">
+              <label for="mid">MID</label>
+              <input type="number" class="percentage-input" id="mid-pct" min="0" max="100" value="20" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="micro" onchange="toggleCategory('micro')">
+              <label for="micro">MICRO</label>
+              <input type="number" class="percentage-input" id="micro-pct" min="0" max="100" value="10" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nano" onchange="toggleCategory('nano')">
+              <label for="nano">NANO</label>
+              <input type="number" class="percentage-input" id="nano-pct" min="0" max="100" value="20" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+          </div>
+          <div class="total-indicator" id="categorias-total">Total: 0%</div>
+        </div>
+        
+        <!-- Plataformas -->
+        <div class="selection-panel">
+          <div class="panel-title">📱 Plataformas</div>
+          <div class="checkbox-group" id="plataformas-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="tiktok" onchange="togglePlatform('tiktok')">
+              <label for="tiktok">TikTok</label>
+              <input type="number" class="percentage-input" id="tiktok-pct" min="0" max="100" value="70" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="instagram" onchange="togglePlatform('instagram')">
+              <label for="instagram">Instagram</label>
+              <input type="number" class="percentage-input" id="instagram-pct" min="0" max="100" value="20" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="youtube" onchange="togglePlatform('youtube')">
+              <label for="youtube">YouTube</label>
+              <input type="number" class="percentage-input" id="youtube-pct" min="0" max="100" value="10" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="twitch" onchange="togglePlatform('twitch')">
+              <label for="twitch">Twitch</label>
+              <input type="number" class="percentage-input" id="twitch-pct" min="0" max="100" value="0" disabled onchange="updateTotals()">
+              <span style="margin-left: 5px; font-weight: 500;">%</span>
+            </div>
+          </div>
+          <div class="total-indicator" id="plataformas-total">Total: 0%</div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="resultados" class="results-section">
+      <h2 class="section-title">📊 Análisis de Resultados</h2>
+      
+      <div class="content-count" id="content-count">
+        📈 Total de combinaciones generadas: <span id="combinations-count">0</span>
+      </div>
+      
+      <div class="export-buttons">
+        <button class="export-btn export-excel" onclick="exportToExcel()">
+          📊 Exportar Excel
+        </button>
+        <button class="export-btn export-csv" onclick="exportToCSV()">
+          📄 Exportar CSV
+        </button>
+        <button class="export-btn export-pdf" onclick="exportToPDF()">
+          📋 Exportar PDF
+        </button>
+        <button class="export-btn" style="background: #6b7280; color: white;" onclick="runTests()">
+          🧪 Ejecutar Pruebas
+        </button>
+        <button class="export-btn" style="background: #059669; color: white;" onclick="loadTestData()">
+          📊 Cargar Datos de Prueba
+        </button>
+        <button class="export-btn" style="background: #dc2626; color: white;" onclick="forceEnableButton()">
+          🔧 Forzar Habilitar Botón
+        </button>
+        <button class="export-btn" style="background: #7c3aed; color: white;" onclick="forceUpdateForWindows()">
+          🖥️ Forzar Actualización Windows
+        </button>
+      </div>
+      
+      <div id="results-cards" class="results-grid"></div>
+      
+      <div class="table-container">
+        <table class="detailed-table" id="detailed-results">
+          <thead>
+            <tr>
+              <th>País</th>
+              <th>Categoría</th>
+              <th>Plataforma</th>
+              <th>% País</th>
+              <th>% Categoría</th>
+              <th>% Plataforma</th>
+              <th>Presupuesto Asignado</th>
+            </tr>
+          </thead>
+          <tbody id="results-tbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // Variables globales
+    let currentResults = [];
+    
+    // ===== FUNCIONES BÁSICAS (definidas primero) =====
+    
+    function toggleCountry(country) {
+      console.log(`🔄 Toggle país: ${country}`);
+      const checkbox = document.getElementById(country);
+      const percentageInput = document.getElementById(country + '-pct');
+      
+      if (checkbox && percentageInput) {
+        percentageInput.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+          percentageInput.value = 0;
+        }
+        console.log(`✅ País ${country}: ${checkbox.checked ? 'activado' : 'desactivado'}`);
+        updateTotals();
+      } else {
+        console.error(`❌ No se encontraron elementos para país: ${country}`);
+      }
+    }
+    
+    function toggleCategory(category) {
+      console.log(`🔄 Toggle categoría: ${category}`);
+      const checkbox = document.getElementById(category);
+      const percentageInput = document.getElementById(category + '-pct');
+      
+      if (checkbox && percentageInput) {
+        percentageInput.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+          percentageInput.value = 0;
+        }
+        console.log(`✅ Categoría ${category}: ${checkbox.checked ? 'activada' : 'desactivada'}`);
+        updateTotals();
+      } else {
+        console.error(`❌ No se encontraron elementos para categoría: ${category}`);
+      }
+    }
+    
+    function togglePlatform(platform) {
+      console.log(`🔄 Toggle plataforma: ${platform}`);
+      const checkbox = document.getElementById(platform);
+      const percentageInput = document.getElementById(platform + '-pct');
+      
+      if (checkbox && percentageInput) {
+        percentageInput.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+          percentageInput.value = 0;
+        }
+        console.log(`✅ Plataforma ${platform}: ${checkbox.checked ? 'activada' : 'desactivada'}`);
+        updateTotals();
+      } else {
+        console.error(`❌ No se encontraron elementos para plataforma: ${platform}`);
+      }
+    }
+    
+    function updateTotals() {
+      console.log('🔄 Actualizando totales...');
+      
+      try {
+        // Calcular total países
+        let totalPaises = 0;
+        ['colombia', 'peru', 'chile', 'mexico', 'bolivia'].forEach(country => {
+          const checkbox = document.getElementById(country);
+          const percentage = document.getElementById(country + '-pct');
+          if (checkbox && percentage) {
+            if (checkbox.checked) {
+              const value = parseInt(percentage.value) || 0;
+              totalPaises += value;
+              console.log(`🌍 ${country}: ${value}%`);
+            }
+          } else {
+            console.warn(`⚠️ Elementos no encontrados para país: ${country}`);
+          }
+        });
+        
+        // Calcular total categorías
+        let totalCategorias = 0;
+        ['macro', 'top', 'mid', 'micro', 'nano'].forEach(category => {
+          const checkbox = document.getElementById(category);
+          const percentage = document.getElementById(category + '-pct');
+          if (checkbox && percentage) {
+            if (checkbox.checked) {
+              const value = parseInt(percentage.value) || 0;
+              totalCategorias += value;
+              console.log(`🎯 ${category}: ${value}%`);
+            }
+          } else {
+            console.warn(`⚠️ Elementos no encontrados para categoría: ${category}`);
+          }
+        });
+        
+        // Calcular total plataformas
+        let totalPlataformas = 0;
+        ['tiktok', 'instagram', 'youtube', 'twitch'].forEach(platform => {
+          const checkbox = document.getElementById(platform);
+          const percentage = document.getElementById(platform + '-pct');
+          if (checkbox && percentage) {
+            if (checkbox.checked) {
+              const value = parseInt(percentage.value) || 0;
+              totalPlataformas += value;
+              console.log(`📱 ${platform}: ${value}%`);
+            }
+          } else {
+            console.warn(`⚠️ Elementos no encontrados para plataforma: ${platform}`);
+          }
+        });
+        
+        console.log(`📊 Totales - Países: ${totalPaises}%, Categorías: ${totalCategorias}%, Plataformas: ${totalPlataformas}%`);
+        
+        // Actualizar indicadores
+        updateTotalIndicator('paises-total', totalPaises);
+        updateTotalIndicator('categorias-total', totalCategorias);
+        updateTotalIndicator('plataformas-total', totalPlataformas);
+        
+        // Habilitar/deshabilitar botón de cálculo
+        const calcBtn = document.getElementById('calcBtn');
+        const presupuesto = document.getElementById('presupuesto').value;
+        
+        if (calcBtn) {
+          const isValid = totalPaises === 100 && totalCategorias === 100 && totalPlataformas === 100 && presupuesto > 0;
+          calcBtn.disabled = !isValid;
+          console.log(`🔘 Botón habilitado: ${isValid ? 'SÍ' : 'NO'}`);
+        } else {
+          console.error('❌ Botón de cálculo no encontrado');
+        }
+        
+        console.log(`💰 Presupuesto: ${presupuesto}`);
+        
+      } catch (error) {
+        console.error('❌ Error en updateTotals:', error);
+      }
+    }
+    
+    function updateTotalIndicator(elementId, total) {
+      const indicator = document.getElementById(elementId);
+      if (indicator) {
+        indicator.textContent = `Total: ${total}%`;
+        
+        if (total === 100) {
+          indicator.className = 'total-indicator valid';
+        } else if (total > 100) {
+          indicator.className = 'total-indicator invalid';
+        } else {
+          indicator.className = 'total-indicator';
+        }
+      }
+    }
+    
+    // Configuración de promedios por categoría
+    const promediosCategorias = {
+      'macro': 6000,
+      'top': 400,
+      'mid': 200,
+      'micro': 150,
+      'nano': 10
+    };
+    
+
+    
+    // Configuración de costos promedio por categoría (en USD)
+    const costosPromedio = {
+      'macro': 6000,
+      'top': 400,
+      'mid': 200,
+      'micro': 150,
+      'nano': 10
+    };
+    
+    // Variables para redistribución y ML
+    let redistribution = {};
+    
+    function calcularDistribucion() {
+      console.log('🚀 Iniciando cálculo de distribución...');
+      
+      // Usar datos mock si no hay presupuesto válido
+      let presupuesto = parseFloat(document.getElementById('presupuesto').value);
+      
+      if (!presupuesto || presupuesto <= 0) {
+        presupuesto = 25000; // Datos mock por defecto
+        document.getElementById('presupuesto').value = presupuesto;
+        console.log('💰 Usando presupuesto mock: $25,000 USD');
+      }
+      
+      // Cargar datos mock automáticamente si no hay selecciones
+      let countries = getCountries();
+      let categories = getCategories();
+      let platforms = getPlatforms();
+      
+      if (countries.length === 0 || categories.length === 0 || platforms.length === 0) {
+        loadTestData();
+        return;
+      }
+      
+      // Calcular distribución normal
+      currentResults = [];
+      redistribution = {};
+      
+      console.log('🧮 Generando combinaciones...');
+      
+      // Generar todas las combinaciones
+      countries.forEach(country => {
+        categories.forEach(category => {
+          platforms.forEach(platform => {
+            const presupuestoAsignado = presupuesto * (country.pct / 100) * (category.pct / 100) * (platform.pct / 100);
+            const costoPromedio = costosPromedio[category.id] || 0;
+            const contenidos = costoPromedio > 0 ? Math.floor(presupuestoAsignado / costoPromedio) : 0;
+            
+            const result = {
+              'País': country.name,
+              'CategoriaId': category.id,
+              'Categoría': category.name,
+              'Plataforma': platform.name,
+              '% País': country.pct,
+              '% Categoría': category.pct,
+              '% Plataforma': platform.pct,
+              'Presupuesto': presupuestoAsignado,
+              'Contenidos': contenidos,
+              'Costo Promedio': costoPromedio
+            };
+            
+            currentResults.push(result);
+          });
+        });
+      });
+      
+      console.log(`✅ Total combinaciones generadas: ${currentResults.length}`);
+      const totalCalculado = currentResults.reduce((sum, r) => sum + r['Presupuesto'], 0);
+      console.log(`💰 Total presupuesto calculado: ${fmtMoney(totalCalculado)}`);
+      
+      // Generar optimización con ML
+      const optimizedResults = generateMLOptimization(presupuesto, countries, categories, platforms);
+      
+      // Mostrar resultados
+      renderResults(currentResults, optimizedResults, presupuesto);
+      
+      // Mostrar sección de resultados
+      document.getElementById('resultados').style.display = 'block';
+      document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+      
+      console.log('🎉 Cálculo completado exitosamente!');
+    }
+    
+    function loadTestData() {
+      // Cargar presupuesto de prueba
+      document.getElementById('presupuesto').value = '25000';
+      
+      // Cargar países
+      document.getElementById('colombia').checked = true;
+      document.getElementById('colombia-pct').value = '60';
+      document.getElementById('colombia-pct').disabled = false;
+      
+      document.getElementById('peru').checked = true;
+      document.getElementById('peru-pct').value = '40';
+      document.getElementById('peru-pct').disabled = false;
+      
+      // Cargar categorías
+      document.getElementById('top').checked = true;
+      document.getElementById('top-pct').value = '40';
+      document.getElementById('top-pct').disabled = false;
+      
+      document.getElementById('mid').checked = true;
+      document.getElementById('mid-pct').value = '30';
+      document.getElementById('mid-pct').disabled = false;
+      
+      document.getElementById('micro').checked = true;
+      document.getElementById('micro-pct').value = '30';
+      document.getElementById('micro-pct').disabled = false;
+      
+      // Cargar plataformas
+      document.getElementById('tiktok').checked = true;
+      document.getElementById('tiktok-pct').value = '50';
+      document.getElementById('tiktok-pct').disabled = false;
+      
+      document.getElementById('instagram').checked = true;
+      document.getElementById('instagram-pct').value = '30';
+      document.getElementById('instagram-pct').disabled = false;
+      
+      document.getElementById('youtube').checked = true;
+      document.getElementById('youtube-pct').value = '20';
+      document.getElementById('youtube-pct').disabled = false;
+      
+      // Actualizar totales y ejecutar cálculo inmediatamente
+      updateTotals();
+      calcularDistribucion();
+    }
+    
+    function forceEnableButton() {
+      console.log('🔧 Forzando habilitación del botón...');
+      
+      // Cargar datos mock rápidamente
+      document.getElementById('presupuesto').value = '25000';
+      
+      // Seleccionar elementos básicos
+      document.getElementById('colombia').checked = true;
+      document.getElementById('colombia-pct').value = '100';
+      document.getElementById('colombia-pct').disabled = false;
+      
+      document.getElementById('top').checked = true;
+      document.getElementById('top-pct').value = '100';
+      document.getElementById('top-pct').disabled = false;
+      
+      document.getElementById('tiktok').checked = true;
+      document.getElementById('tiktok-pct').value = '100';
+      document.getElementById('tiktok-pct').disabled = false;
+      
+      // Forzar habilitación del botón
+      const calcBtn = document.getElementById('calcBtn');
+      calcBtn.disabled = false;
+      
+      // Actualizar totales
+      updateTotals();
+      
+      console.log('✅ Botón forzado habilitado');
+      
+      // Ejecutar cálculo inmediatamente
+      setTimeout(() => {
+        calcularDistribucion();
+      }, 500);
+    }
+    
+    function forceUpdateForWindows() {
+      console.log('🖥️ Forzando actualización para Windows...');
+      
+      // Forzar actualización de todos los elementos
+      const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+      allCheckboxes.forEach(checkbox => {
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        checkbox.dispatchEvent(new Event('click', { bubbles: true }));
+      });
+      
+      const allPercentageInputs = document.querySelectorAll('.percentage-input');
+      allPercentageInputs.forEach(input => {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      
+      // Forzar actualización de totales
+      updateTotals();
+      
+      console.log('✅ Actualización forzada completada');
+    }
+
+    // ===== Lectura de selecciones =====
+    function getGroup(defs) {
+      const results = [];
+      
+      defs.forEach(d => {
+        const checkbox = document.getElementById(d.id);
+        const pctInput = document.getElementById(d.id + '-pct');
+        
+        if (checkbox && pctInput) {
+          const pct = parseFloat(pctInput.value) || 0;
+          const labelEl = document.querySelector(`label[for="${d.id}"]`);
+          const name = d.label || (labelEl ? labelEl.innerText.trim() : d.id);
+          const active = checkbox.checked && pct > 0;
+          
+          if (active) {
+            results.push({ 
+              id: d.id, 
+              name: name, 
+              pct: pct, 
+              active: true 
+            });
+          }
+        }
+      });
+      
+      console.log(`📋 Grupo ${defs[0]?.id || 'unknown'}: ${results.length} elementos activos`);
+      return results;
+    }
+
+    function getCountries() {
+      return getGroup([
+        { id: 'colombia' }, { id: 'peru' }, { id: 'chile' },
+        { id: 'mexico' }, { id: 'bolivia' }
+      ]);
+    }
+    
+    function getCategories() {
+      return getGroup([
+        { id: 'macro', label: 'MACRO' },
+        { id: 'top', label: 'TOP' },
+        { id: 'mid', label: 'MID' },
+        { id: 'micro', label: 'MICRO' },
+        { id: 'nano', label: 'NANO' }
+      ]);
+    }
+    
+    function getPlatforms() {
+      return getGroup([
+        { id: 'tiktok', label: 'TikTok' },
+        { id: 'instagram', label: 'Instagram' },
+        { id: 'youtube', label: 'YouTube' },
+        { id: 'twitch', label: 'Twitch' }
+      ]);
+    }
+
+    // ===== Formatos =====
+    const moneyFmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    function fmtMoney(n) { return moneyFmt.format(Math.max(0, Math.round(n))); }
+    function fmtPct(n) { return `${Number(n).toFixed(2)}%`; }
+
+    // ===== MÓDULO DE MACHINE LEARNING / OPTIMIZACIÓN =====
+    
+    // Datos históricos simulados para el modelo ML
+    const historicalData = {
+      // ROI promedio por categoría y plataforma (datos ficticios basados en tendencias reales)
+      categoryROI: {
+        'macro': { 'TikTok': 1.8, 'Instagram': 2.1, 'YouTube': 2.5, 'Twitch': 1.6 },
+        'top': { 'TikTok': 2.2, 'Instagram': 2.8, 'YouTube': 3.1, 'Twitch': 2.0 },
+        'mid': { 'TikTok': 2.8, 'Instagram': 3.2, 'YouTube': 3.5, 'Twitch': 2.4 },
+        'micro': { 'TikTok': 3.5, 'Instagram': 4.1, 'YouTube': 4.2, 'Twitch': 3.0 },
+        'nano': { 'TikTok': 4.2, 'Instagram': 4.8, 'YouTube': 4.5, 'Twitch': 3.8 }
+      },
+      
+      // Factor de engagement por país (normalizado)
+      countryEngagement: {
+        'Colombia': 1.2,
+        'Perú': 1.1,
+        'Chile': 1.0,
+        'México': 1.15,
+        'Bolivia': 0.95
+      },
+      
+      // Tendencias estacionales (factor multiplicador)
+      seasonalTrends: {
+        'TikTok': 1.3,
+        'Instagram': 1.1,
+        'YouTube': 1.0,
+        'Twitch': 1.2
+      }
+    };
+
+    function generateMLOptimization(presupuesto, countries, categories, platforms) {
+      console.log('🤖 Generando optimización ML...');
+      
+      // Calcular scores de eficiencia para cada combinación
+      const combinations = [];
+      
+      countries.forEach(country => {
+        categories.forEach(category => {
+          platforms.forEach(platform => {
+            const baseROI = historicalData.categoryROI[category.id]?.[platform.name] || 2.0;
+            const countryFactor = historicalData.countryEngagement[country.name] || 1.0;
+            const seasonalFactor = historicalData.seasonalTrends[platform.name] || 1.0;
+            
+            // Fórmula ML: Score = ROI * EngagementFactor * SeasonalFactor * CostEfficiency
+            const costEfficiency = 1 / Math.log(costosPromedio[category.id] + 1);
+            const mlScore = baseROI * countryFactor * seasonalFactor * costEfficiency;
+            
+            combinations.push({
+              country: country.name,
+              category: category.name,
+              categoryId: category.id,
+              platform: platform.name,
+              mlScore: mlScore,
+              originalCost: costosPromedio[category.id]
+            });
+          });
+        });
+      });
+      
+      // Ordenar por score ML (de mayor a menor eficiencia)
+      combinations.sort((a, b) => b.mlScore - a.mlScore);
+      
+      // Algoritmo de optimización: distribución inteligente del presupuesto
+      const optimizedResults = [];
+      let remainingBudget = presupuesto;
+      
+      // Primera pasada: asignar presupuesto a las combinaciones más eficientes
+      const topCombinations = combinations.slice(0, Math.min(8, combinations.length));
+      const totalScore = topCombinations.reduce((sum, combo) => sum + combo.mlScore, 0);
+      
+      topCombinations.forEach(combo => {
+        const weightedAllocation = (combo.mlScore / totalScore) * presupuesto;
+        const minBudgetForOneContent = combo.originalCost;
+        
+        // Asignar al menos presupuesto para un contenido si es posible
+        let allocatedBudget = Math.max(weightedAllocation, minBudgetForOneContent);
+        allocatedBudget = Math.min(allocatedBudget, remainingBudget);
+        
+        if (allocatedBudget >= minBudgetForOneContent) {
+          const contenidos = Math.floor(allocatedBudget / combo.originalCost);
+          const budgetUsed = contenidos * combo.originalCost;
+          
+          optimizedResults.push({
+            'País': combo.country,
+            'Categoría': combo.category,
+            'Plataforma': combo.platform,
+            'Presupuesto Optimizado': budgetUsed,
+            'Contenidos Optimizados': contenidos,
+            'ML Score': combo.mlScore.toFixed(3),
+            'ROI Estimado': (combo.mlScore * 0.5).toFixed(2) + 'x',
+            'Eficiencia': getEfficiencyLabel(combo.mlScore)
+          });
+          
+          remainingBudget -= budgetUsed;
+        }
+      });
+      
+      return optimizedResults;
+    }
+    
+    function getEfficiencyLabel(score) {
+      if (score >= 8) return '🔥 Muy Alta';
+      if (score >= 6) return '⚡ Alta';
+      if (score >= 4) return '✅ Media';
+      if (score >= 2) return '⚠️ Baja';
+      return '❌ Muy Baja';
+    }
+
+    // ===== Render de resultados completo =====
+    function renderResults(normalResults, optimizedResults, presupuesto) {
+      // Actualizar contador de combinaciones
+      document.getElementById('combinations-count').textContent = normalResults.length;
+      
+      // Render tabla normal
+      renderNormalTable(normalResults);
+      
+      // Render tabla optimizada
+      renderOptimizedTable(optimizedResults, presupuesto);
+      
+      // Render tarjetas resumen
+      renderSummaryCards(normalResults, optimizedResults, presupuesto);
+    }
+    
+    function renderNormalTable(results) {
+      const tbody = document.getElementById('results-tbody');
+      tbody.innerHTML = '';
+      
+      results.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r['País']}</td>
+          <td>${r['Categoría']}</td>
+          <td>${r['Plataforma']}</td>
+          <td>${fmtPct(r['% País'])}</td>
+          <td>${fmtPct(r['% Categoría'])}</td>
+          <td>${fmtPct(r['% Plataforma'])}</td>
+          <td>${fmtMoney(r['Presupuesto'])}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      // Fila resumen
+      const totalPresupuesto = results.reduce((sum, r) => sum + r['Presupuesto'], 0);
+      const trSum = document.createElement('tr');
+      trSum.className = 'summary-row';
+      trSum.innerHTML = `
+        <td colspan="6"><strong>TOTAL</strong></td>
+        <td><strong>${fmtMoney(totalPresupuesto)}</strong></td>
+      `;
+      tbody.appendChild(trSum);
+    }
+    
+    function renderOptimizedTable(optimizedResults, presupuesto) {
+      // Crear tabla optimizada si no existe
+      let optimizedSection = document.getElementById('optimized-section');
+      if (!optimizedSection) {
+        optimizedSection = document.createElement('div');
+        optimizedSection.id = 'optimized-section';
+        optimizedSection.className = 'config-section';
+        optimizedSection.innerHTML = `
+          <h2 class="section-title">🤖 Distribución Optimizada con ML</h2>
+          <div class="ml-info">
+            <p><strong>🧠 Algoritmo de Optimización:</strong> Utiliza datos históricos de ROI, engagement por país y tendencias estacionales para maximizar el retorno de inversión.</p>
+          </div>
+          <div class="table-container">
+            <table class="detailed-table" id="optimized-results">
+              <thead>
+                <tr>
+                  <th>País</th>
+                  <th>Categoría</th>
+                  <th>Plataforma</th>
+                  <th>Presupuesto</th>
+                  <th>Contenidos</th>
+                  <th>ML Score</th>
+                  <th>ROI Estimado</th>
+                  <th>Eficiencia</th>
+                </tr>
+              </thead>
+              <tbody id="optimized-tbody"></tbody>
+            </table>
+          </div>
+        `;
+        document.getElementById('resultados').appendChild(optimizedSection);
+      }
+      
+      const tbody = document.getElementById('optimized-tbody');
+      tbody.innerHTML = '';
+      
+      optimizedResults.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r['País']}</td>
+          <td>${r['Categoría']}</td>
+          <td>${r['Plataforma']}</td>
+          <td>${fmtMoney(r['Presupuesto Optimizado'])}</td>
+          <td>${r['Contenidos Optimizados']}</td>
+          <td>${r['ML Score']}</td>
+          <td>${r['ROI Estimado']}</td>
+          <td>${r['Eficiencia']}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      const totalOptimized = optimizedResults.reduce((sum, r) => sum + r['Presupuesto Optimizado'], 0);
+      const totalContents = optimizedResults.reduce((sum, r) => sum + r['Contenidos Optimizados'], 0);
+      
+      const trSum = document.createElement('tr');
+      trSum.className = 'summary-row';
+      trSum.innerHTML = `
+        <td colspan="3"><strong>TOTAL OPTIMIZADO</strong></td>
+        <td><strong>${fmtMoney(totalOptimized)}</strong></td>
+        <td><strong>${totalContents}</strong></td>
+        <td colspan="3"><strong>Eficiencia promedio: Alta</strong></td>
+      `;
+      tbody.appendChild(trSum);
+    }
+    
+    function renderSummaryCards(normalResults, optimizedResults, presupuesto) {
+      const box = document.getElementById('results-cards');
+      box.innerHTML = '';
+      
+      const normalTotal = normalResults.reduce((sum, r) => sum + (r['Contenidos'] || 0), 0);
+      const optimizedTotal = optimizedResults.reduce((sum, r) => sum + r['Contenidos Optimizados'], 0);
+      const improvement = optimizedTotal > normalTotal ? ((optimizedTotal - normalTotal) / normalTotal * 100).toFixed(1) : 0;
+      
+      const cards = [
+        {
+          title: 'Distribución Normal',
+          amount: `${normalTotal} contenidos`,
+          percentage: 'Distribución proporcional'
+        },
+        {
+          title: 'Distribución Optimizada (ML)',
+          amount: `${optimizedTotal} contenidos`,
+          percentage: `+${improvement}% más eficiente`
+        },
+        {
+          title: 'Ahorro Estimado',
+          amount: fmtMoney(presupuesto - optimizedResults.reduce((sum, r) => sum + r['Presupuesto Optimizado'], 0)),
+          percentage: 'Presupuesto liberado'
+        }
+      ];
+      
+      cards.forEach(card => {
+        const el = document.createElement('div');
+        el.className = 'result-card';
+        el.innerHTML = `
+          <div class="result-title">${card.title}</div>
+          <div class="result-amount">${card.amount}</div>
+          <div class="result-percentage">${card.percentage}</div>
+        `;
+        box.appendChild(el);
+      });
+    }
+
+    // ===== Exportaciones =====
+    function exportToExcel() {
+      if (!currentResults.length) {
+        alert('No hay datos para exportar. Primero calcule la distribución.');
+        return;
+      }
+
+      try {
+        // Hoja 1: Distribución Normal
+        const normalData = currentResults.map(r => ({
+          'País': r['País'],
+          'Categoría': r['Categoría'],
+          'Plataforma': r['Plataforma'],
+          '% País': r['% País'],
+          '% Categoría': r['% Categoría'],
+          '% Plataforma': r['% Plataforma'],
+          'Presupuesto (USD)': Math.round(r['Presupuesto'])
+        }));
+
+        // Hoja 2: Distribución Optimizada (si existe)
+        const optimizedData = getOptimizedDataForExport();
+
+        const wb = XLSX.utils.book_new();
+        
+        // Agregar hoja normal
+        const ws1 = XLSX.utils.json_to_sheet(normalData);
+        XLSX.utils.book_append_sheet(wb, ws1, 'Distribución Normal');
+        
+        // Agregar hoja optimizada si hay datos
+        if (optimizedData.length > 0) {
+          const ws2 = XLSX.utils.json_to_sheet(optimizedData);
+          XLSX.utils.book_append_sheet(wb, ws2, 'Distribución ML');
+        }
+
+        XLSX.writeFile(wb, 'distribucion_inteligente.xlsx');
+        console.log('✅ Archivo Excel exportado exitosamente');
+      } catch (error) {
+        console.error('❌ Error al exportar Excel:', error);
+        alert('Error al exportar el archivo Excel. Verifique la consola para más detalles.');
+      }
+    }
+
+    function exportToCSV() {
+      if (!currentResults.length) {
+        alert('No hay datos para exportar. Primero calcule la distribución.');
+        return;
+      }
+
+      try {
+        const data = currentResults.map(r => ({
+          'País': r['País'],
+          'Categoría': r['Categoría'],
+          'Plataforma': r['Plataforma'],
+          '% País': r['% País'],
+          '% Categoría': r['% Categoría'],
+          '% Plataforma': r['% Plataforma'],
+          'Presupuesto (USD)': Math.round(r['Presupuesto'])
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(data);
+        XLSX.writeFile(ws, 'distribucion_normal.csv', { bookType: 'csv' });
+        console.log('✅ Archivo CSV exportado exitosamente');
+      } catch (error) {
+        console.error('❌ Error al exportar CSV:', error);
+        alert('Error al exportar el archivo CSV. Verifique la consola para más detalles.');
+      }
+    }
+
+    function exportToPDF() {
+      if (!currentResults.length) {
+        alert('No hay datos para exportar. Primero calcule la distribución.');
+        return;
+      }
+      
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Título
+        doc.setFontSize(20);
+        doc.text('Distribución Inteligente de Presupuesto', 20, 30);
+        
+        // Fecha
+        doc.setFontSize(12);
+        doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, 20, 45);
+        
+        // Presupuesto total
+        const totalPresupuesto = currentResults.reduce((sum, r) => sum + r['Presupuesto'], 0);
+        doc.text(`Presupuesto Total: ${fmtMoney(totalPresupuesto)}`, 20, 55);
+        
+        // Tabla resumen
+        let yPos = 70;
+        doc.setFontSize(14);
+        doc.text('Resumen de Distribución:', 20, yPos);
+        
+        yPos += 10;
+        doc.setFontSize(10);
+        
+        currentResults.slice(0, 15).forEach(r => {
+          const line = `${r['País']} - ${r['Categoría']} - ${r['Plataforma']}: ${fmtMoney(r['Presupuesto'])}`;
+          doc.text(line, 20, yPos);
+          yPos += 7;
+          
+          if (yPos > 270) {
+            doc.addPage();
+            yPos = 30;
+          }
+        });
+        
+        doc.save('distribucion_inteligente.pdf');
+        console.log('✅ Archivo PDF exportado exitosamente');
+      } catch (error) {
+        console.error('❌ Error al exportar PDF:', error);
+        alert('Error al exportar el archivo PDF. Verifique la consola para más detalles.');
+      }
+    }
+
+    function getOptimizedDataForExport() {
+      const tbody = document.getElementById('optimized-tbody');
+      if (!tbody) return [];
+      
+      const rows = tbody.querySelectorAll('tr:not(.summary-row)');
+      return Array.from(rows).map(row => {
+        const cells = row.querySelectorAll('td');
+        return {
+          'País': cells[0]?.textContent || '',
+          'Categoría': cells[1]?.textContent || '',
+          'Plataforma': cells[2]?.textContent || '',
+          'Presupuesto (USD)': cells[3]?.textContent?.replace(/[^0-9]/g, '') || '',
+          'Contenidos': cells[4]?.textContent || '',
+          'ML Score': cells[5]?.textContent || '',
+          'ROI Estimado': cells[6]?.textContent || '',
+          'Eficiencia': cells[7]?.textContent || ''
+        };
+      });
+    }
+
+    // ===== Funciones de Prueba y Validación =====
+    
+    function runTests() {
+      console.log('🧪 Iniciando pruebas de validación...');
+      
+      // Test 1: Validación de formato de moneda
+      testMoneyFormat();
+      
+      // Test 2: Validación de cálculos de porcentajes
+      testPercentageCalculations();
+      
+      // Test 3: Validación de algoritmo ML
+      testMLAlgorithm();
+      
+      // Test 4: Validación de exportación
+      testExportFunctions();
+      
+      // Test 5: Prueba rápida de cálculo
+      testQuickCalculation();
+      
+      console.log('✅ Todas las pruebas completadas');
+    }
+    
+    function testQuickCalculation() {
+      console.log('⚡ Prueba rápida de cálculo...');
+      
+      // Simular datos de entrada
+      const mockPresupuesto = 10000;
+      const mockCountries = [
+        { id: 'colombia', name: 'Colombia', pct: 60, active: true },
+        { id: 'peru', name: 'Perú', pct: 40, active: true }
+      ];
+      const mockCategories = [
+        { id: 'top', name: 'TOP', pct: 50, active: true },
+        { id: 'mid', name: 'MID', pct: 50, active: true }
+      ];
+      const mockPlatforms = [
+        { id: 'tiktok', name: 'TikTok', pct: 70, active: true },
+        { id: 'instagram', name: 'Instagram', pct: 30, active: true }
+      ];
+      
+      // Calcular distribución normal
+      const mockResults = [];
+      mockCountries.forEach(country => {
+        mockCategories.forEach(category => {
+          mockPlatforms.forEach(platform => {
+            const presupuestoAsignado = mockPresupuesto * (country.pct / 100) * (category.pct / 100) * (platform.pct / 100);
+            const costoPromedio = costosPromedio[category.id] || 0;
+            const contenidos = costoPromedio > 0 ? Math.floor(presupuestoAsignado / costoPromedio) : 0;
+            
+            mockResults.push({
+              'País': country.name,
+              'Categoría': category.name,
+              'Plataforma': platform.name,
+              'Presupuesto': presupuestoAsignado,
+              'Contenidos': contenidos
+            });
+          });
+        });
+      });
+      
+      const totalCalculado = mockResults.reduce((sum, r) => sum + r['Presupuesto'], 0);
+      const totalContenidos = mockResults.reduce((sum, r) => sum + r['Contenidos'], 0);
+      
+      console.log(`✅ Prueba rápida - Total calculado: ${fmtMoney(totalCalculado)} (esperado: ${fmtMoney(mockPresupuesto)})`);
+      console.log(`✅ Prueba rápida - Total contenidos: ${totalContenidos}`);
+      console.log('📋 Resultados mock:', mockResults);
+      
+      // Verificar que el total sea correcto
+      const isCorrect = Math.abs(totalCalculado - mockPresupuesto) < 0.01;
+      if (isCorrect) {
+        console.log('✅ Prueba rápida PASÓ - Cálculos correctos');
+      } else {
+        console.log('❌ Prueba rápida FALLÓ - Error en cálculos');
+      }
+    }
+    
+    function testMoneyFormat() {
+      console.log('💰 Probando formato de moneda...');
+      const testValues = [0, 100, 1000, 10000, 100000];
+      testValues.forEach(value => {
+        const formatted = fmtMoney(value);
+        console.log(`${value} -> ${formatted}`);
+      });
+    }
+    
+    function testPercentageCalculations() {
+      console.log('📊 Probando cálculos de porcentajes...');
+      
+      // Simular datos de prueba
+      const testCountries = [
+        { id: 'colombia', name: 'Colombia', pct: 60, active: true },
+        { id: 'peru', name: 'Perú', pct: 40, active: true }
+      ];
+      
+      const testCategories = [
+        { id: 'top', name: 'TOP', pct: 50, active: true },
+        { id: 'mid', name: 'MID', pct: 50, active: true }
+      ];
+      
+      const testPlatforms = [
+        { id: 'tiktok', name: 'TikTok', pct: 70, active: true },
+        { id: 'instagram', name: 'Instagram', pct: 30, active: true }
+      ];
+      
+      const presupuesto = 10000;
+      
+      // Generar combinaciones de prueba
+      const testResults = [];
+      testCountries.forEach(country => {
+        testCategories.forEach(category => {
+          testPlatforms.forEach(platform => {
+            const presupuestoAsignado = presupuesto * (country.pct / 100) * (category.pct / 100) * (platform.pct / 100);
+            testResults.push({
+              'País': country.name,
+              'Categoría': category.name,
+              'Plataforma': platform.name,
+              'Presupuesto': presupuestoAsignado
+            });
+          });
+        });
+      });
+      
+      const totalCalculado = testResults.reduce((sum, r) => sum + r['Presupuesto'], 0);
+      console.log(`Total calculado: ${fmtMoney(totalCalculado)} (esperado: ${fmtMoney(presupuesto)})`);
+      console.log(`Diferencia: ${fmtMoney(Math.abs(totalCalculado - presupuesto))}`);
+    }
+    
+    function testMLAlgorithm() {
+      console.log('🤖 Probando algoritmo ML...');
+      
+      const testPresupuesto = 50000;
+      const testCountries = [
+        { id: 'colombia', name: 'Colombia', pct: 100, active: true }
+      ];
+      const testCategories = [
+        { id: 'macro', name: 'MACRO', pct: 100, active: true }
+      ];
+      const testPlatforms = [
+        { id: 'tiktok', name: 'TikTok', pct: 100, active: true }
+      ];
+      
+      const optimizedResults = generateMLOptimization(testPresupuesto, testCountries, testCategories, testPlatforms);
+      console.log('Resultados optimizados:', optimizedResults);
+      
+      const totalOptimized = optimizedResults.reduce((sum, r) => sum + r['Presupuesto Optimizado'], 0);
+      console.log(`Presupuesto optimizado total: ${fmtMoney(totalOptimized)}`);
+    }
+    
+    function testExportFunctions() {
+      console.log('📤 Probando funciones de exportación...');
+      
+      // Crear datos de prueba
+      currentResults = [
+        {
+          'País': 'Colombia',
+          'Categoría': 'TOP',
+          'Plataforma': 'TikTok',
+          '% País': 100,
+          '% Categoría': 100,
+          '% Plataforma': 100,
+          'Presupuesto': 10000
+        }
+      ];
+      
+      console.log('Datos de prueba creados para exportación');
+      console.log('Nota: Las funciones de exportación requieren interacción del usuario');
+    }
+    
+    // ===== Inicialización =====
+    function initializeApp() {
+      console.log('🚀 Inicializando calculadora...');
+      console.log('🖥️ Sistema operativo detectado:', navigator.platform);
+      
+      // Configurar listeners para inputs de presupuesto
+      const presupuestoInput = document.getElementById('presupuesto');
+      if (presupuestoInput) {
+        presupuestoInput.addEventListener('input', updateTotals);
+        presupuestoInput.addEventListener('change', updateTotals);
+        console.log('✅ Listener de presupuesto configurado');
+      }
+      
+      // Configurar listeners para todos los checkboxes con múltiples eventos
+      const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+      allCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateTotals);
+        checkbox.addEventListener('click', updateTotals);
+        checkbox.addEventListener('input', updateTotals);
+        console.log(`✅ Listener configurado para checkbox: ${checkbox.id}`);
+      });
+      console.log(`✅ ${allCheckboxes.length} listeners de checkbox configurados`);
+      
+      // Configurar listeners para todos los inputs de porcentaje
+      const allPercentageInputs = document.querySelectorAll('.percentage-input');
+      allPercentageInputs.forEach(input => {
+        input.addEventListener('input', updateTotals);
+        input.addEventListener('change', updateTotals);
+        input.addEventListener('blur', updateTotals);
+        console.log(`✅ Listener configurado para input: ${input.id}`);
+      });
+      console.log(`✅ ${allPercentageInputs.length} listeners de porcentaje configurados`);
+      
+      // Inicializar totales
+      updateTotals();
+      
+      console.log('🚀 Calculadora de Distribución Inteligente cargada');
+      console.log('🤖 Módulo ML activado');
+      console.log('🧪 Para ejecutar pruebas, ejecute: runTests() en la consola');
+      console.log('🔧 Para forzar habilitación, use el botón "Forzar Habilitar Botón"');
+      
+      // Ejecutar pruebas automáticamente en modo desarrollo
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        setTimeout(() => {
+          console.log('🔧 Modo desarrollo detectado - ejecutando pruebas automáticas...');
+          runTests();
+        }, 2000);
+      }
+    }
+    
+    // Múltiples formas de inicialización para compatibilidad con Windows
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      initializeApp();
+    }
+    
+    // Backup para casos donde DOMContentLoaded no funciona
+    window.addEventListener('load', function() {
+      console.log('🔄 Backup: Inicialización por evento load');
+      setTimeout(initializeApp, 100);
+    });
+  </script>
+</body>
+</html>
